@@ -6,11 +6,11 @@
                 <div id="taskInsertion">Add new Task</div>
             </div>
 
-            <tasklist></tasklist>
+            <tasklist v-bind:filter="homeFilters"></tasklist>
         </main>
 
         <div v-if="formExpanded" class="taskform-overlay" @click="handleOverlayClick">
-            <taskform ref="taskform" @close="formExpanded = false" />
+            <taskform ref="taskform" v-on:close="formExpanded = false" />
         </div>
 
     </div>
@@ -29,6 +29,9 @@ export default {
     data: function () {
         return {
             formExpanded: false,
+            homeFilters: {
+
+            }
         }
     },
     methods: {
@@ -37,7 +40,7 @@ export default {
             if (taskFormEl && !taskFormEl.contains(e.target)) {
                 this.formExpanded = false;
             }
-        }
+        },
     }
 
 }
@@ -47,7 +50,7 @@ export default {
 #homeview {
     height: 100vh;
     width: 100%;
-    background-color: rgb(206, 209, 212);
+    background-color: rgb(244, 246, 247);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -58,18 +61,20 @@ export default {
     height: 70%;
     width: 80%;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     display: flex;
     flex-direction: column;
 }
 
 .taskform-top {
-    height: 30px;
+    height: 40px;
     display: flex;
     align-items: center;
     gap: 10px;
+    padding-left: 10px;
     cursor: text;
+    text-align: center;
+    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .plus-icon {

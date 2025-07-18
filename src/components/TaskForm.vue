@@ -44,10 +44,10 @@
                     </select>
                 </div>
 
-                
-                
+
+
             </div>
-            <button id="submitTask" @click="submitTask">Add Task</button>
+            <button class="submit-button" @click="submitTask">Submit Task</button>
         </div>
     </div>
 </template>
@@ -65,7 +65,7 @@ export default {
                 dueTime: '',
                 description: '',
                 group: '',
-                priority: ''
+                priority: '',
             }
         };
     },
@@ -142,8 +142,23 @@ export default {
     margin-right: 8px;
 }
 
-#submitTask {
+.submit-button {
+    display: block;
+    margin: 30px auto 0 auto;
+    padding: 5px 10px;
+    background-color: #2da6c4;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
+
+.submit-button:hover {
+    background-color: #268ca5;
+}
+
 
 
 @media (max-width: 600px) {
