@@ -1,6 +1,5 @@
 <template>
     <div id="tasklist">
-        
     </div>
 </template>
 

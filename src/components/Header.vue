@@ -23,8 +23,8 @@ export default {
 
 <style>
 #mainheader {
-    height: 40px;
-    background-color: rgb(45, 196, 151);
+    height: 50px;
+    background-color: #2C3E50;
     margin: 0;
     padding: 0;
     display: flex;
@@ -36,12 +36,13 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-left: 10px;
 }
 
 #logo {
-    height: 30px;
-    width: 40px;
-    background-image: url('../assets/images/logo.png');
+    height: 35px;
+    width: 50px;
+    background-image: url('../assets/images/logo2.png');
     background-repeat: no-repeat;
     background-position: center;
     border-radius: 5px;
