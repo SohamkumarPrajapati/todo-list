@@ -10,7 +10,7 @@
                 <span class="plus-icon" ref="insertTaskIcon">+</span>
                 <div id="taskInsertion">Add new Task</div>
             </div>
-            <tasklist v-bind:filter="homeFilters"></tasklist>
+            <tasklist :key="taskListKey" v-bind:filter="homeFilters"></tasklist>
         </main>
         <div v-if="formExpanded" class="taskform-overlay" @click="handleOverlayClick">
             <taskform ref="taskform" v-on:taskAdded="handleTaskAdded" v-on:close="formExpanded = false" />
@@ -40,6 +40,7 @@ export default {
             homeFilters: {},
             groups: ['Office', 'Family', 'Health'],
             priorities: ['Low', 'Medium', 'High'],
+            taskListKey: 0, // Key to force TaskList to re-render
         }
     },
     methods: {
@@ -64,6 +65,7 @@ export default {
             if (task.group && !this.groups.includes(task.group)) {
                 this.groups.push(task.group);
             }
+            this.taskListKey++; // This will force TaskList to re-render and fetch tasks
         }
     }
 
@@ -137,9 +139,11 @@ export default {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-left: 10px;
+    padding: 10px 16px;
     text-align: center;
-    box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+    background: #fff;
+    border-radius: 8px;
 }
 
 .plus-icon {
@@ -155,7 +159,7 @@ export default {
     height: 20px;
     width: 100%;
     text-align: left;
-    padding-top: 7px;
+    padding-top: 5px;
     font-size: 16px;
     cursor: text;
     color: grey;

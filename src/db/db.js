@@ -2,7 +2,7 @@ const DB_NAME = 'todoAppDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'tasks';
 
-export function openDB() {
+export async function openDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -27,77 +27,93 @@ export function openDB() {
     });
 }
 
-export function addTask(task) {
-    return openDB().then(db => {
-        return new Promise((resolve, reject) => {
-            const transaction = db.transaction(STORE_NAME, 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.add(task);
+export async function addTask(task) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.add(task);
 
-            request.onsuccess = function () {
-                resolve(request.result); // the auto-generated task ID
-            };
+        request.onsuccess = function () {
+            resolve(request.result); // the auto-generated task ID
+        };
 
-            request.onerror = function (event) {
-                reject('Error adding task:', event.target.error);
-            };
-        });
+        request.onerror = function (event) {
+            reject('Error adding task:', event.target.error);
+        };
     });
 }
 
 
-
-export function updateTask(task) {
+export async function getTasksByFilter(filter) {
+    const db = await openDB();
     return new Promise((resolve, reject) => {
-        const tx = db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.put(task);
-        request.onsuccess = () => resolve(true);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-
-export function deleteTask(id) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction([STORE_NAME], 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.delete(id);
-        request.onsuccess = () => resolve(true);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-
-export function getTaskById(id) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction([STORE_NAME], 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(id);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-
-export function getTasksByGroup(group) {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction([STORE_NAME], 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const index = store.index('group');
-        const request = index.getAll(group);
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
-}
-
-
-export function getAllTasks() {
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction([STORE_NAME], 'readonly');
-        const store = tx.objectStore(STORE_NAME);
+        const transaction = db.transaction(STORE_NAME, 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
         const request = store.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+
+        request.onsuccess = function () {
+            let tasks = request.result || [];
+            if (filter.completion) {
+                tasks = tasks.filter(task =>
+                    filter.completion === 'Completed' ? task.completed : !task.completed
+                );
+            }
+            if (filter.group) {
+                tasks = tasks.filter(task => task.group === filter.group);
+            }
+            if (filter.priority) {
+                tasks = tasks.filter(task => task.priority === filter.priority);
+            }
+            resolve(tasks);
+        };
+
+        request.onerror = function (event) {
+            reject('Error fetching tasks:', event.target.error);
+        };
+    });
+}
+
+export async function updateTaskCompletion(id, completed) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const getReq = store.get(id);
+        getReq.onsuccess = function () {
+            const task = getReq.result;
+            if (task) {
+                task.completed = completed;
+                const putReq = store.put(task);
+                putReq.onsuccess = () => resolve();
+                putReq.onerror = (e) => reject(e);
+            } else {
+                reject('Task not found');
+            }
+        };
+        getReq.onerror = (e) => reject(e);
+    });
+}
+
+export async function updateTask(task) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const putReq = store.put(task);
+        putReq.onsuccess = () => resolve();
+        putReq.onerror = (e) => reject(e);
+    });
+}
+
+
+export async function deleteTask(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(STORE_NAME, 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.delete(id);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e);
     });
 }

@@ -68,15 +68,15 @@ export default {
         }
     },
     methods: {
-        submitTask() {
-            addTask(this.task)
-                .then(id => {
-                    this.task.id = id;
-                    this.$emit('close');
-                    this.$emit('taskAdded', this.task);
-                    alert('Task added with ID: ' + id);
-                })
-                .catch(console.error);
+        async submitTask() {
+            try {
+                const id = await addTask(this.task);
+                this.task.id = id;
+                this.$emit('close');
+                this.$emit('taskAdded', this.task);
+            } catch (error) {
+                console.error(error);
+            }
         }
     },
     mounted() {
