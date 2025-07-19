@@ -26,28 +26,24 @@
 
                 <div class="icon-field">
                     <i class="fa fa-layer-group"></i>
-                    <select v-model="task.group">
-                        <option disabled value="">Select Group</option>
-                        <option>Office</option>
-                        <option>Family</option>
-                        <option>Health</option>
-                    </select>
+                    <input type="text" v-model="task.group" list="group-options" placeholder="Select or enter group" />
+                    <datalist id="group-options">
+                        <option v-for="group in groups" v-bind:value="group"></option>
+                    </datalist>
                 </div>
 
                 <div class="icon-field">
                     <i class="fa fa-star"></i>
                     <select v-model="task.priority">
                         <option disabled value="">Select Priority</option>
-                        <option>Low</option>
-                        <option>Medium</option>
-                        <option>High</option>
+                        <option v-for="priority in priorities" v-bind:value="priority">{{ priority }}</option>
                     </select>
                 </div>
 
 
 
             </div>
-            <button class="submit-button" @click="submitTask">Submit Task</button>
+            <button class="submit-button" @click="submitTask">Add Task</button>
         </div>
     </div>
 </template>
@@ -66,8 +62,10 @@ export default {
                 description: '',
                 group: '',
                 priority: '',
-            }
-        };
+            },
+            groups: ['Office', 'Family', 'Health'],
+            priorities: ['Low', 'Medium', 'High'],
+        }
     },
     methods: {
         submitTask() {
@@ -75,6 +73,7 @@ export default {
                 .then(id => {
                     this.task.id = id;
                     this.$emit('close');
+                    this.$emit('taskAdded', this.task);
                     alert('Task added with ID: ' + id);
                 })
                 .catch(console.error);

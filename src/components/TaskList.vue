@@ -1,7 +1,5 @@
 <template>
     <div id="tasklist">
-        <div id="controllers">
-        </div>
 
 
     </div>
@@ -16,7 +14,6 @@ export default {
         'taskitem': TaskItem,
     },
     props: {
-        //based on the filter by homeView it will take props and list the task with that filter only
         filter: {
             type: Object,
             required: true,
