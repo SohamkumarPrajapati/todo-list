@@ -92,8 +92,7 @@ export default {
 
 .filters-btn {
     padding: 7px 14px;
-    background: #2da6c4;
-    color: #fff;
+    color: #bbb;
     border: none;
     border-radius: 6px;
     font-size: 18px;
@@ -110,6 +109,7 @@ export default {
 
 .filters-btn:hover {
     background: #268ca5;
+    color: white;
 }
 
 .filters-overlay {
