@@ -49,7 +49,7 @@ export default {
 
 <style scoped>
 .filters-popup {
-  background: #fff;
+  background: #ECF0F1;
   border-radius: 8px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   padding: 24px 20px 16px 20px;

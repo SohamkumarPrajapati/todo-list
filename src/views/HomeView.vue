@@ -1,6 +1,9 @@
 <template>
     <div id="homeview">
-        <div class="filters-btn-container">
+        <div class="controllers">
+            <div class="group-priority-btn" @click="groupPriorityExpanded = true">
+                <i class="fa-solid fa-star"></i>
+            </div>
             <div class="filters-btn" @click="filtersExpanded = true">
                 <i class="fa-solid fa-filter"></i>
             </div>
@@ -34,6 +37,9 @@
         <div v-if="filtersExpanded" class="filters-overlay" @click="handleFiltersOverlayClick">
             <filters ref="filters" @apply-filters="handleApplyFilters" />
         </div>
+        <div v-if="groupPriorityExpanded" class="groupPriority-overlay" @click="handleGroupPriortyOverlayClick">
+            <group-priority ref="groupPriority" @apply-group-priority="handleApplyGroupPriority"></group-priority>
+        </div>
     </div>
 </template>
 
@@ -42,6 +48,7 @@ import TaskForm from '../components/TaskForm.vue';
 import TaskList from '../components/TaskList.vue';
 import Filters from '../components/Filters.vue';
 import { getAllGroups } from '../db/db';
+import GroupPriority from '../components/GroupPriority.vue';
 
 export default {
     name: 'HomeView',
@@ -49,11 +56,13 @@ export default {
         'taskform': TaskForm,
         'tasklist': TaskList,
         'filters': Filters,
+        'group-priority': GroupPriority,
     },
     data: function () {
         return {
             formExpanded: false,
             filtersExpanded: false,
+            groupPriorityExpanded: false,
             homeFilters: {},
             groups: [],
             openAccordions: [],
@@ -93,6 +102,16 @@ export default {
         isAccordionOpen(group) {
             return this.openAccordions.includes(group);
         },
+        handleGroupPriortyOverlayClick(e) {
+            const groupPriority = this.$refs.groupPriority && this.$refs.groupPriority.$el;
+            if (groupPriority && !groupPriority.contains(e.target)) {
+                this.groupPriorityExpanded = false;
+            }
+        },
+        handleApplyGroupPriority(groupsAfterPriorty) {
+            this.groups = { ...groupsAfterPriorty };
+            this.groupPriorityExpanded = false;
+        }
     },
     async created() {
         let fetchedGroups = await getAllGroups();
@@ -114,15 +133,16 @@ export default {
     align-items: center;
 }
 
-.filters-btn-container {
+.controllers {
     width: 80%;
     display: flex;
     justify-content: flex-end;
     padding: 0px 20px;
 }
 
-.filters-btn {
-    padding: 7px 14px;
+.filters-btn,
+.group-priority-btn {
+    padding: 7px 10px;
     color: #bbb;
     border: none;
     border-radius: 6px;
@@ -134,15 +154,24 @@ export default {
     justify-content: center;
 }
 
+.group-priority-btn i {
+    font-size: 20px;
+}
+
 .filters-btn i {
     font-size: 20px;
+}
+
+.group-priority-btn:hover {
+    color: #268ca5;
 }
 
 .filters-btn:hover {
     color: #268ca5;
 }
 
-.filters-overlay {
+.filters-overlay,
+.groupPriority-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -197,10 +226,13 @@ export default {
     transition: background 0.18s, box-shadow 0.18s;
     outline: none;
 }
-.plus-fab:hover, .plus-fab:focus {
+
+.plus-fab:hover,
+.plus-fab:focus {
     background: linear-gradient(135deg, #268ca5 60%, #2da6c4 100%);
     box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
 }
+
 .plus-fab i {
     font-size: 15px;
     pointer-events: none;
@@ -240,7 +272,7 @@ export default {
     font-size: 17px;
     font-weight: 500;
     padding: 14px 22px;
-    border-radius: 8px 8px 0 0;
+    border-radius: 10px 8px;
     cursor: pointer;
     display: flex;
     align-items: center;

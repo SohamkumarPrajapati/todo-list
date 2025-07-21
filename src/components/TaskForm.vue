@@ -35,7 +35,7 @@
                 <div class="icon-field">
                     <i class="fa fa-star"></i>
                     <select v-model="task.priority">
-                        <option disabled value="">Select Priority</option>
+                        <option disabled value="">Select Task Priority</option>
                         <option v-for="priority in priorities" v-bind:value="priority">{{ priority }}</option>
                     </select>
                 </div>

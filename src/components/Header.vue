@@ -57,7 +57,7 @@ export default {
 }
 
 #userIcon {
-    height: 20px;
+    height: 27px;
     width: 50px;
     background-image: url('../assets/images/user-solid.svg');
     background-repeat: no-repeat;
