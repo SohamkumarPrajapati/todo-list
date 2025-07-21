@@ -129,14 +129,31 @@ export async function deleteTask(id) {
     });
 }
 
+/**
+ * 
+ * @param {String} groupName 
+ * @returns Promise
+ */
 export async function addGroup(groupName) {
+    if (groupName === '') {
+        return;
+    }
     const db = await openDB();
-    return new Promise((resolve,reject) => {
-        const transaction = db.transaction(GROUP_STORE,'readwrite');
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(GROUP_STORE, 'readwrite');
         const store = transaction.objectStore(GROUP_STORE);
-        const request = store.add({name: groupName});
-
-        request.onsuccess = () => resolve();
+        // Check if group already exists
+        const getReq = store.get(groupName);
+        getReq.onsuccess = function () {
+            if (getReq.result) {
+                resolve('Group already exists');
+            } else {
+                const addReq = store.add({ name: groupName });
+                addReq.onsuccess = () => resolve();
+                addReq.onerror = (e) => reject(e);
+            }
+        };
+        getReq.onerror = (e) => reject(e);
     });
 }
 

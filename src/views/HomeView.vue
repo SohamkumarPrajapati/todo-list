@@ -10,13 +10,24 @@
                 <span class="plus-icon" ref="insertTaskIcon">+</span>
                 <div id="taskInsertion">Add new Task</div>
             </div>
-            <tasklist :key="taskListKey" v-bind:filter="homeFilters"></tasklist>
+            <div class="accordians">
+                <div v-for="group in groups" :key="group">
+                    <div class="accordion-header" @click="toggleAccordion(group)">
+                        {{ group }}
+                        <span v-if="isAccordionOpen(group)"><i class="fa-solid fa-chevron-up"></i></span>
+                        <span v-else><i class="fa-solid fa-chevron-down"></i></span>
+                    </div>
+                    <div v-show="isAccordionOpen(group)">
+                        <tasklist :filter="{ ...homeFilters, group }" />
+                    </div>
+                </div>
+            </div>
         </main>
         <div v-if="formExpanded" class="taskform-overlay" @click="handleOverlayClick">
             <taskform ref="taskform" v-on:taskAdded="handleTaskAdded" v-on:close="formExpanded = false" />
         </div>
         <div v-if="filtersExpanded" class="filters-overlay" @click="handleFiltersOverlayClick">
-            <filters ref="filters" :groups="groups" :priorities="priorities" @apply-filters="handleApplyFilters" />
+            <filters ref="filters" @apply-filters="handleApplyFilters" />
         </div>
     </div>
 </template>
@@ -40,8 +51,8 @@ export default {
             filtersExpanded: false,
             homeFilters: {},
             groups: [],
+            openAccordions: [],
             priorities: ['Low', 'Medium', 'High'],
-            taskListKey: 0, // Key to force TaskList to re-render
         }
     },
     methods: {
@@ -62,8 +73,21 @@ export default {
             this.filtersExpanded = false;
         },
         handleTaskAdded(task) {
-            this.taskListKey++; // This will force TaskList to re-render and fetch tasks
-        }
+            // Update groups if new group is added
+            if (task.group && !this.groups.includes(task.group)) {
+                this.groups.push(task.group);
+            }
+        },
+        toggleAccordion(group) {
+            if (this.openAccordions.includes(group)) {
+                this.openAccordions = this.openAccordions.filter(g => g !== group);
+            } else {
+                this.openAccordions.push(group);
+            }
+        },
+        isAccordionOpen(group) {
+            return this.openAccordions.includes(group);
+        },
     },
     async created() {
         let fetchedGroups = await getAllGroups();
@@ -89,7 +113,7 @@ export default {
     width: 80%;
     display: flex;
     justify-content: flex-end;
-    padding-right: 20px;
+    padding: 0px 20px;
 }
 
 .filters-btn {
@@ -135,6 +159,10 @@ export default {
     flex-direction: column;
 }
 
+.accordians {
+    overflow-y: auto;
+}
+
 .taskform-top {
     height: 40px;
     display: flex;
@@ -177,5 +205,56 @@ export default {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+}
+.accordians {
+    margin-top: 24px;
+}
+.accordion-header {
+    background: #eaf6fa;
+    color: #268ca5;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 14px 22px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.18s, color 0.18s;
+    border: 1px solid #d0e6ee;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.accordion-header:hover {
+    background: #d0e6ee;
+    color: #2da6c4;
+}
+.accordion-header span {
+    font-size: 20px;
+    margin-left: 12px;
+}
+.accordians > div {
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #d0e6ee;
+}
+.accordians > div .accordion-header {
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid #d0e6ee;
+}
+.accordians > div .accordion-header[aria-expanded="true"] {
+    background: #2da6c4;
+    color: #fff;
+}
+.accordians > div > div[style*="display: block"],
+.accordians > div > div[style*="display: flex"] {
+    animation: fadeInAccordion 0.25s;
+}
+@keyframes fadeInAccordion {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>

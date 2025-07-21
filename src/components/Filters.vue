@@ -9,13 +9,6 @@
         </select>
       </div>
       <div class="filter-field">
-        <label><i class="fa fa-layer-group"></i> Group:</label>
-        <select v-model="filters.group">
-          <option value="">All</option>
-          <option v-for="group in groups" :key="group" :value="group">{{ group }}</option>
-        </select>
-      </div>
-      <div class="filter-field">
         <label><i class="fa fa-star"></i> Priority:</label>
         <select v-model="filters.priority">
           <option value="">All</option>
@@ -35,32 +28,22 @@
 
 export default {
   name: 'Filters',
-  props: {
-    groups: {
-      type: Array,
-      default: () => ['Office', 'Family', 'Health']
-    },
-    priorities: {
-      type: Array,
-      default: () => ['Low', 'Medium', 'High']
-    }
-  },
   data() {
     return {
       filters: {
         completion: '',
-        group: '',
         priority: '',
         dueDate: ''
       },
-      completionOptions: ['Pending', 'Completed']
+      completionOptions: ['Pending', 'Completed'],
+      priorities: ['Low', 'Medium', 'High'],
     }
   },
   methods: {
     applyFilters() {
       this.$emit('apply-filters', { ...this.filters });
     }
-  }
+  },
 }
 </script>
 
@@ -68,7 +51,7 @@ export default {
 .filters-popup {
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   padding: 24px 20px 16px 20px;
   min-width: 260px;
   max-width: 320px;
@@ -76,20 +59,31 @@ export default {
   position: relative;
   animation: popIn 0.18s;
 }
+
 @keyframes popIn {
-  from { transform: scale(0.95); opacity: 0.7; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
+
 .filters-form {
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
+
 .filter-field {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 .filter-field label {
   min-width: 90px;
   font-weight: 500;
@@ -98,6 +92,7 @@ export default {
   align-items: center;
   gap: 5px;
 }
+
 .filter-field select {
   flex: 1;
   padding: 5px 8px;
@@ -105,6 +100,7 @@ export default {
   border: 1px solid #bbb;
   font-size: 14px;
 }
+
 .filter-field input {
   flex: 1;
   padding: 5px 8px;
@@ -112,6 +108,7 @@ export default {
   border: 1px solid #bbb;
   font-size: 14px;
 }
+
 .apply-btn {
   margin-top: 10px;
   background: #2da6c4;
@@ -123,6 +120,7 @@ export default {
   cursor: pointer;
   transition: background 0.18s;
 }
+
 .apply-btn:hover {
   background: #268ca5;
 }
