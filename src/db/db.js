@@ -65,6 +65,9 @@ export async function getTasksByFilter(filter) {
             if (filter.priority) {
                 tasks = tasks.filter(task => task.priority === filter.priority);
             }
+            if(filter.dueDate) {
+                tasks = tasks.filter(task => task.dueDate === filter.dueDate);
+            }
             resolve(tasks);
         };
 

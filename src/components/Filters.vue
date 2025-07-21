@@ -22,12 +22,17 @@
           <option v-for="priority in priorities" :key="priority" :value="priority">{{ priority }}</option>
         </select>
       </div>
+      <div class="filter-field">
+        <label><i class="fa-solid fa-calendar"></i>DueDate:</label>
+        <input type="date" v-model="filters.dueDate">
+      </div>
       <button class="apply-btn" @click="applyFilters">Apply</button>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'Filters',
   props: {
@@ -45,7 +50,8 @@ export default {
       filters: {
         completion: '',
         group: '',
-        priority: ''
+        priority: '',
+        dueDate: ''
       },
       completionOptions: ['Pending', 'Completed']
     }
@@ -93,6 +99,13 @@ export default {
   gap: 5px;
 }
 .filter-field select {
+  flex: 1;
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  font-size: 14px;
+}
+.filter-field input {
   flex: 1;
   padding: 5px 8px;
   border-radius: 4px;

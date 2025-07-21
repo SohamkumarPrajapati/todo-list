@@ -108,8 +108,7 @@ export default {
 }
 
 .filters-btn:hover {
-    background: #268ca5;
-    color: white;
+    color: #268ca5;
 }
 
 .filters-overlay {
