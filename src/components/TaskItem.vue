@@ -179,7 +179,7 @@ export default {
 
 .task-title {
     flex: 1;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 500;
     color: #2c3e50;
     user-select: none;

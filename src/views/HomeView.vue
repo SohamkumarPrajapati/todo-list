@@ -7,13 +7,18 @@
         </div>
         <main>
             <div class="taskform-top" @click="formExpanded = true">
-                <span class="plus-icon" ref="insertTaskIcon">+</span>
+                <button class="plus-fab" ref="insertTaskIcon" aria-label="Add Task">
+                    <i class="fa fa-plus"></i>
+                </button>
                 <div id="taskInsertion">Add new Task</div>
             </div>
             <div class="accordians">
                 <div v-for="group in groups" :key="group">
                     <div class="accordion-header" @click="toggleAccordion(group)">
-                        {{ group }}
+                        <div>
+                            <i class="fa fa-layer-group"></i>
+                            {{ group }}
+                        </div>
                         <span v-if="isAccordionOpen(group)"><i class="fa-solid fa-chevron-up"></i></span>
                         <span v-else><i class="fa-solid fa-chevron-down"></i></span>
                     </div>
@@ -159,36 +164,53 @@ export default {
     flex-direction: column;
 }
 
-.accordians {
-    overflow-y: auto;
-}
 
 .taskform-top {
-    height: 40px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    text-align: center;
+    gap: 14px;
+    padding: 12px 18px;
+    background: #eaf6fa;
+    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
-    background: #fff;
-    border-radius: 8px;
+    margin-bottom: 18px;
+    border: 1px solid #d0e6ee;
 }
 
-.plus-icon {
-    height: 20px;
-    width: 20px;
-    font-size: 24px;
-    color: black;
-    font-weight: 300;
+.plus-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    width: 25px;
+    border-radius: 20%;
+    background: linear-gradient(135deg, #2da6c4 60%, #268ca5 100%);
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
     cursor: pointer;
+    transition: background 0.18s, box-shadow 0.18s;
+    outline: none;
+}
+.plus-fab:hover, .plus-fab:focus {
+    background: linear-gradient(135deg, #268ca5 60%, #2da6c4 100%);
+    box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
+}
+.plus-fab i {
+    font-size: 15px;
+    pointer-events: none;
 }
 
 #taskInsertion {
     height: 20px;
     width: 100%;
     text-align: left;
-    padding-top: 5px;
+    padding-top: 2px;
     font-size: 16px;
     cursor: text;
     color: grey;
@@ -206,13 +228,16 @@ export default {
     align-items: center;
     z-index: 1000;
 }
+
 .accordians {
     margin-top: 24px;
+    overflow-y: auto;
 }
+
 .accordion-header {
     background: #eaf6fa;
     color: #268ca5;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 500;
     padding: 14px 22px;
     border-radius: 8px 8px 0 0;
@@ -225,15 +250,18 @@ export default {
     border-bottom: none;
     margin-bottom: 0;
 }
+
 .accordion-header:hover {
     background: #d0e6ee;
     color: #2da6c4;
 }
+
 .accordion-header span {
     font-size: 20px;
     margin-left: 12px;
 }
-.accordians > div {
+
+.accordians>div {
     margin-bottom: 18px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
@@ -241,20 +269,31 @@ export default {
     overflow: hidden;
     border: 1px solid #d0e6ee;
 }
-.accordians > div .accordion-header {
+
+.accordians>div .accordion-header {
     border-radius: 8px 8px 0 0;
     border-bottom: 1px solid #d0e6ee;
 }
-.accordians > div .accordion-header[aria-expanded="true"] {
+
+.accordians>div .accordion-header[aria-expanded="true"] {
     background: #2da6c4;
     color: #fff;
 }
-.accordians > div > div[style*="display: block"],
-.accordians > div > div[style*="display: flex"] {
+
+.accordians>div>div[style*="display: block"],
+.accordians>div>div[style*="display: flex"] {
     animation: fadeInAccordion 0.25s;
 }
+
 @keyframes fadeInAccordion {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
