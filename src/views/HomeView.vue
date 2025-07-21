@@ -25,6 +25,7 @@
 import TaskForm from '../components/TaskForm.vue';
 import TaskList from '../components/TaskList.vue';
 import Filters from '../components/Filters.vue';
+import { getAllGroups } from '../db/db';
 
 export default {
     name: 'HomeView',
@@ -38,7 +39,7 @@ export default {
             formExpanded: false,
             filtersExpanded: false,
             homeFilters: {},
-            groups: ['Office', 'Family', 'Health'],
+            groups: [],
             priorities: ['Low', 'Medium', 'High'],
             taskListKey: 0, // Key to force TaskList to re-render
         }
@@ -61,12 +62,13 @@ export default {
             this.filtersExpanded = false;
         },
         handleTaskAdded(task) {
-            // Update groups if new group is added
-            if (task.group && !this.groups.includes(task.group)) {
-                this.groups.push(task.group);
-            }
             this.taskListKey++; // This will force TaskList to re-render and fetch tasks
         }
+    },
+    async created() {
+        let fetchedGroups = await getAllGroups();
+        this.groups = fetchedGroups;
+        console.log(fetchedGroups);
     }
 
 }

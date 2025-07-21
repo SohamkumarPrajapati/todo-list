@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { addTask } from '../db/db.js';
+import { addTask, addGroup } from '../db/db.js';
 
 export default {
     name: 'TaskForm',
@@ -71,6 +71,7 @@ export default {
         async submitTask() {
             try {
                 const id = await addTask(this.task);
+                await addGroup(this.task.group);
                 this.task.id = id;
                 this.$emit('close');
                 this.$emit('taskAdded', this.task);
