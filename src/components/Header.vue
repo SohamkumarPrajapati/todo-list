@@ -4,7 +4,9 @@
             <div id="logo"></div>
             <div id="title">{{ title }}</div>
         </div>
-        <div id="userIcon"></div>
+        <router-link to="/signin">
+            <div id="userIcon"></div>
+        </router-link>
     </header>
 </template>
 
@@ -21,7 +23,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #mainheader {
     height: 50px;
     background-color: #2C3E50;
