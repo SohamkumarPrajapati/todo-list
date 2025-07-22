@@ -24,6 +24,10 @@ export default {
         filter: {
             type: Object,
             required: true,
+        },
+        sort: {
+            type: String,
+            default: '',
         }
     },
     data() {
@@ -40,7 +44,18 @@ export default {
     },
     methods: {
         async fetchTasks() {
-            this.tasks = await getTasksByFilter(this.filter);
+            let tasks = await getTasksByFilter(this.filter);
+            if (this.sort === 'priority') {
+                const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+                tasks = tasks.slice().sort((a, b) => (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4));
+            } else if (this.sort === 'duedate') {
+                tasks = tasks.slice().sort((a, b) => {
+                    if (!a.dueDate) return 1;
+                    if (!b.dueDate) return -1;
+                    return new Date(a.dueDate) - new Date(b.dueDate);
+                });
+            }
+            this.tasks = tasks;
         },
         removeTask(task) {
             this.tasks = this.tasks.filter(t => t.id !== task.id);

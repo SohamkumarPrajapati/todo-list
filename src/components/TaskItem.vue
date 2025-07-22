@@ -229,7 +229,7 @@ export default {
 
 .taskitem-details {
     background: #f7fafc;
-    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
     padding: 12px 28px 14px 48px;
     display: flex;
     flex-direction: column;

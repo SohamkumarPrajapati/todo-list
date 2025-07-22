@@ -50,6 +50,7 @@
 
 <script>
 import { addTask, addGroup } from '../db/db.js';
+import { getAllGroups } from '../db/db.js';
 
 export default {
     name: 'TaskForm',
@@ -80,13 +81,14 @@ export default {
             }
         }
     },
-    mounted() {
+    async mounted() {
         if (!this.task.dueDate) {
             this.task.dueDate = new Date().toISOString().split('T')[0];
         }
         if (!this.task.dueTime) {
             this.task.dueTime = '09:00';
         }
+        this.groups = await getAllGroups();
     }
 
 };

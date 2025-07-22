@@ -1,13 +1,5 @@
 <template>
     <div id="homeview">
-        <div class="controllers">
-            <div class="group-priority-btn" @click="groupPriorityExpanded = true">
-                <i class="fa-solid fa-star"></i>
-            </div>
-            <div class="filters-btn" @click="filtersExpanded = true">
-                <i class="fa-solid fa-filter"></i>
-            </div>
-        </div>
         <main>
             <div class="taskform-top" @click="formExpanded = true">
                 <button class="plus-fab" ref="insertTaskIcon" aria-label="Add Task">
@@ -22,11 +14,25 @@
                             <i class="fa fa-layer-group"></i>
                             {{ group }}
                         </div>
-                        <span v-if="isAccordionOpen(group)"><i class="fa-solid fa-chevron-up"></i></span>
-                        <span v-else><i class="fa-solid fa-chevron-down"></i></span>
+                        <div>
+                            <div v-if="isAccordionOpen(group)" class="sort-btn" @click.stop="toggleSortSelect(group)">
+                                <i class="fa-solid fa-sort"></i>
+                            </div>
+                            <select v-if="sortSelectOpen === group && isAccordionOpen(group)" class="sort-select"
+                                v-model="groupSorts[group]" @change="closeSortSelect" @click.stop>
+                                <option value="priority">Priority</option>
+                                <option value="duedate">Due Date</option>
+                            </select>
+                            <div v-if="isAccordionOpen(group)" class="filters-btn" @click.stop="openFilters(group)">
+                                <i class="fa-solid fa-filter"></i>
+                            </div>
+                            <span v-if="!isAccordionOpen(group)">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
+                        </div>
                     </div>
                     <div v-show="isAccordionOpen(group)">
-                        <tasklist :filter="{ ...homeFilters, group }" />
+                        <tasklist :filter="getGroupFilter(group)" :sort="groupSorts[group]" />
                     </div>
                 </div>
             </div>
@@ -37,9 +43,6 @@
         <div v-if="filtersExpanded" class="filters-overlay" @click="handleFiltersOverlayClick">
             <filters ref="filters" @apply-filters="handleApplyFilters" />
         </div>
-        <div v-if="groupPriorityExpanded" class="groupPriority-overlay" @click="handleGroupPriortyOverlayClick">
-            <group-priority ref="groupPriority" @apply-group-priority="handleApplyGroupPriority"></group-priority>
-        </div>
     </div>
 </template>
 
@@ -48,7 +51,6 @@ import TaskForm from '../components/TaskForm.vue';
 import TaskList from '../components/TaskList.vue';
 import Filters from '../components/Filters.vue';
 import { getAllGroups } from '../db/db';
-import GroupPriority from '../components/GroupPriority.vue';
 
 export default {
     name: 'HomeView',
@@ -56,17 +58,18 @@ export default {
         'taskform': TaskForm,
         'tasklist': TaskList,
         'filters': Filters,
-        'group-priority': GroupPriority,
     },
     data: function () {
         return {
             formExpanded: false,
             filtersExpanded: false,
-            groupPriorityExpanded: false,
-            homeFilters: {},
             groups: [],
             openAccordions: [],
             priorities: ['Low', 'Medium', 'High'],
+            groupSorts: {}, // { groupName: 'priority' | 'duedate' }
+            sortSelectOpen: null, // group name for which select is open
+            groupFilters: {}, // { groupName: { ...filterObj } }
+            filterGroupOpen: null // group name for which filter is open
         }
     },
     methods: {
@@ -83,11 +86,13 @@ export default {
             }
         },
         handleApplyFilters(filters) {
-            this.homeFilters = { ...filters };
-            this.filtersExpanded = false;
+            if (this.filterGroupOpen) {
+                this.$set(this.groupFilters, this.filterGroupOpen, { ...filters });
+                this.filtersExpanded = false;
+                this.filterGroupOpen = null;
+            }
         },
         handleTaskAdded(task) {
-            // Update groups if new group is added
             if (task.group && !this.groups.includes(task.group)) {
                 this.groups.push(task.group);
             }
@@ -102,27 +107,54 @@ export default {
         isAccordionOpen(group) {
             return this.openAccordions.includes(group);
         },
-        handleGroupPriortyOverlayClick(e) {
-            const groupPriority = this.$refs.groupPriority && this.$refs.groupPriority.$el;
-            if (groupPriority && !groupPriority.contains(e.target)) {
-                this.groupPriorityExpanded = false;
+        toggleSortSelect(group) {
+            if (this.sortSelectOpen) {
+                this.sortSelectOpen = null;
+            }
+            else {
+                this.sortSelectOpen = group;
             }
         },
-        handleApplyGroupPriority(groupsAfterPriorty) {
-            this.groups = { ...groupsAfterPriorty };
-            this.groupPriorityExpanded = false;
-        }
+        closeSortSelect() {
+            this.sortSelectOpen = null;
+        },
+        openFilters(group) {
+            this.filtersExpanded = true;
+            this.filterGroupOpen = group;
+        },
+        getGroupFilter(group) {
+            return { ...this.groupFilters[group], group };
+        },
     },
     async created() {
-        let fetchedGroups = await getAllGroups();
-        this.groups = fetchedGroups;
-        console.log(fetchedGroups);
+        this.groups = await getAllGroups();
     }
 
 }
 </script>
 
 <style scoped>
+.sort-select {
+    position: absolute;
+    right: 32px;
+    top: 32px;
+    z-index: 20;
+    background: #fff;
+    border: 1px solid #2da6c4;
+    border-radius: 6px;
+    font-size: 15px;
+    padding: 4px 10px;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.13);
+    outline: none;
+    color: #268ca5;
+    min-width: 110px;
+    cursor: pointer;
+}
+
+.sort-select:focus {
+    border-color: #268ca5;
+}
+
 #homeview {
     height: 100vh;
     width: 100%;
@@ -133,17 +165,8 @@ export default {
     align-items: center;
 }
 
-.controllers {
-    width: 80%;
-    display: flex;
-    justify-content: flex-end;
-    padding: 0px 20px;
-}
-
-.filters-btn,
-.group-priority-btn {
-    padding: 7px 10px;
-    color: #bbb;
+.filters-btn {
+    color: #2c9ebb;
     border: none;
     border-radius: 6px;
     font-size: 18px;
@@ -154,24 +177,11 @@ export default {
     justify-content: center;
 }
 
-.group-priority-btn i {
-    font-size: 20px;
-}
-
 .filters-btn i {
     font-size: 20px;
 }
 
-.group-priority-btn:hover {
-    color: #268ca5;
-}
-
-.filters-btn:hover {
-    color: #268ca5;
-}
-
-.filters-overlay,
-.groupPriority-overlay {
+.filters-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -264,6 +274,15 @@ export default {
 .accordians {
     margin-top: 24px;
     overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE and Edge */
+}
+
+.accordians::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, Opera */
 }
 
 .accordion-header {
@@ -288,9 +307,12 @@ export default {
     color: #2da6c4;
 }
 
-.accordion-header span {
+.accordion-header div {
+    position: relative;
     font-size: 20px;
-    margin-left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .accordians>div {
