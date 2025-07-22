@@ -57,19 +57,6 @@ export default {
   max-width: 320px;
   z-index: 2000;
   position: relative;
-  animation: popIn 0.18s;
-}
-
-@keyframes popIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0.7;
-  }
-
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 .filters-form {

@@ -2,7 +2,7 @@
     <div id="homeview">
         <main>
             <div class="taskform-top" @click="formExpanded = true">
-                <button class="plus-fab" ref="insertTaskIcon" aria-label="Add Task">
+                <button class="plus-fab" ref="insertTaskIcon">
                     <i class="fa fa-plus"></i>
                 </button>
                 <div id="taskInsertion">Add new Task</div>
@@ -65,7 +65,6 @@ export default {
             filtersExpanded: false,
             groups: [],
             openAccordions: [],
-            priorities: ['Low', 'Medium', 'High'],
             groupSorts: {}, // { groupName: 'priority' | 'duedate' }
             sortSelectOpen: null, // group name for which select is open
             groupFilters: {}, // { groupName: { ...filterObj } }
