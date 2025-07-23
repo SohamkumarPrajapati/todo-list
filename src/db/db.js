@@ -148,7 +148,15 @@ export async function addGroup(groupName) {
             if (getReq.result) {
                 resolve('Group already exists');
             } else {
-                const addReq = store.add({ name: groupName });
+                const addReq = store.add({
+                    name: groupName,
+                    filters: {
+                        completion: '',
+                        priority: '',
+                        dueDate: ''
+                    },
+                    sort: ''
+                });
                 addReq.onsuccess = () => resolve();
                 addReq.onerror = (e) => reject(e);
             }
@@ -183,4 +191,126 @@ export async function getAllGroups() {
             reject('Error getting groups', event.target.error);
         }
     })
+}
+
+
+/**
+ * gets the filter set for the group
+ * @param {String} group - groupName 
+ * @returns Promise
+ */
+export async function getFilters(group) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(GROUP_STORE, 'readonly');
+        const store = transaction.objectStore(GROUP_STORE);
+        const request = store.get(group);
+
+        request.onsuccess = function () {
+            if (request.result) {
+                resolve(request.result.filters);
+            }
+            else { // rerturn empty filter if the group don't exist
+                resolve({
+                    completion: '',
+                    priority: '',
+                    dueDate: ''
+                })
+            }
+        }
+
+        request.onerror = function(error) {
+            reject('Error getting group', event.target.error);
+        }
+    });
+}
+
+/**
+ * sets the filters to the group
+ * @param {String} groupName 
+ * @param {Object} groupFilters - filter object holding filter values 
+ * @returns {Promise}
+ */
+export async function setFilters(groupName,groupFilters) {
+    const db = await openDB();
+    return new Promise((resolve,reject) => {
+        const transaction = db.transaction(GROUP_STORE,"readwrite");
+        const store = transaction.objectStore(GROUP_STORE);
+        const getRequest = store.get(groupName);
+
+        getRequest.onsuccess = function() {
+            const group = getRequest.result;
+            let groupOnModifiedFilters = {
+                name: group.name,
+                filters: groupFilters,
+                sort: group.sort,
+            }
+
+            const putRequest = store.put(groupOnModifiedFilters);
+            putRequest.onsuccess = () => resolve();
+            putRequest.onerror = (e) => reject(e.target.error);
+        }
+        getRequest.onerror = function(event) {
+            reject('Error getting group',event.target.error);
+        }
+    });
+}
+
+
+/**
+ * gets  the sorting applied to group
+ * @param {String} groupName 
+ * @returns {Promise}
+ */
+export async function getSorting(groupName) {
+    const db = await openDB();
+    return new Promise((resolve,reject) => {
+        const transaction = db.transaction(GROUP_STORE,'readonly');
+        const store = transaction.objectStore(GROUP_STORE);
+        const request = store.get(groupName);
+
+        request.onsuccess = function() {
+            if(request.result) {
+                resolve(request.result.sort);
+            }
+            else {
+                resolve('');
+            }
+        }
+
+        request.onerror = function(event) {
+            reject('Error getting group', event.target.error);
+        }
+    });
+}
+
+
+/**
+ * 
+ * @param {String} groupName 
+ * @param {String} groupSorting |-> values can be 'priority' or 'duedate'
+ * @returns 
+ */
+export async function setSorting(groupName,groupSorting) {
+    const db = await openDB();
+    return new Promise((resolve,reject) => {
+        const transaction = db.transaction(GROUP_STORE,'readwrite');
+        const store = db.objectStore(GROUP_STORE);
+        const getRequest = store.get(groupName);
+
+        getRequest.onsuccess = function() {
+            const group = getRequest.result;
+            let groupOnModifiedSort = {
+                name: groupName,
+                filters: group.filters,
+                sort: groupSorting
+            };
+            const putRequest = store.put(groupOnModifiedSort);
+            putRequest.onsuccess = () => resolve();
+            putRequest.onerror = (e) => reject(e);
+        }
+        getRequest.onerror = function(event) {
+            reject('Error getting group', event.target.error);
+        }
+    });
 }

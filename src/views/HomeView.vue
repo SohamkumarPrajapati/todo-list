@@ -32,7 +32,8 @@
                         </div>
                     </div>
                     <div v-show="isAccordionOpen(group)">
-                        <tasklist :filter="getGroupFilter(group)" :sort="groupSorts[group]" />
+                        <tasklist :group="group" :sort="groupSorts[group]"
+                            :filter-update-key="taskListUpdateKeys[group]" />
                     </div>
                 </div>
             </div>
@@ -41,7 +42,7 @@
             <taskform ref="taskform" v-on:taskAdded="handleTaskAdded" v-on:close="formExpanded = false" />
         </div>
         <div v-if="filtersExpanded" class="filters-overlay" @click="handleFiltersOverlayClick">
-            <filters ref="filters" @apply-filters="handleApplyFilters" />
+            <filters ref="filters" :group="filterGroupOpen" @apply-filters="handleApplyFilters" />
         </div>
     </div>
 </template>
@@ -67,8 +68,8 @@ export default {
             openAccordions: [],
             groupSorts: {}, // { groupName: 'priority' | 'duedate' }
             sortSelectOpen: null, // group name for which select is open
-            groupFilters: {}, // { groupName: { ...filterObj } }
-            filterGroupOpen: null // group name for which filter is open
+            filterGroupOpen: null, // group name for which filter is open
+            taskListUpdateKeys: {} // { groupName: number }
         }
     },
     methods: {
@@ -86,7 +87,11 @@ export default {
         },
         handleApplyFilters(filters) {
             if (this.filterGroupOpen) {
-                this.$set(this.groupFilters, this.filterGroupOpen, { ...filters });
+                if (!this.taskListUpdateKeys[this.filterGroupOpen]) {
+                    this.$set(this.taskListUpdateKeys, this.filterGroupOpen, 1);
+                } else {
+                    this.$set(this.taskListUpdateKeys, this.filterGroupOpen, this.taskListUpdateKeys[this.filterGroupOpen] + 1);
+                }
                 this.filtersExpanded = false;
                 this.filterGroupOpen = null;
             }
@@ -120,9 +125,6 @@ export default {
         openFilters(group) {
             this.filtersExpanded = true;
             this.filterGroupOpen = group;
-        },
-        getGroupFilter(group) {
-            return { ...this.groupFilters[group], group };
         },
     },
     async created() {

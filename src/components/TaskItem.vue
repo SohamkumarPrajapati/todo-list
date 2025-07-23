@@ -8,8 +8,8 @@
             <span v-if="!editMode" class="task-title" @click="toggleDetails">{{ localTask.title }}</span>
             <input v-else class="task-title-input" v-model="editableTask.title" @click.stop :readonly="!editMode" />
             <div class="actions">
-                <i v-if="!editMode" class="fa fa-pen-to-square edit-icon" @click="startEdit"></i>
-                <i v-else class="fa fa-check update-icon" @click="updateTask"></i>
+                <i v-if="!editMode && !this.completed" class="fa fa-pen-to-square edit-icon" @click="startEdit"></i>
+                <i v-else-if="!this.completed" class="fa fa-check update-icon" @click="updateTask"></i>
                 <i class="fa fa-trash delete-icon" @click="deleteTask"></i>
             </div>
         </div>
@@ -61,7 +61,8 @@ export default {
             showDetails: false,
             editMode: false,
             localTask: { ...this.task },
-            editableTask: {}
+            editableTask: {},
+            completed: (this.task.completed !== undefined) ? this.task.completed : false,
         }
     },
     watch: {
@@ -78,6 +79,7 @@ export default {
         },
         async toggleCompletion() {
             this.localTask.completed = !this.localTask.completed;
+            this.completed = !this.completed;
             await updateTaskCompletion(this.localTask.id, this.localTask.completed);
         },
         startEdit() {

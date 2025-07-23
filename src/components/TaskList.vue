@@ -1,20 +1,15 @@
 <template>
     <div id="tasklist">
         <div class="tasks-container">
-            <taskitem
-                v-for="task in tasks"
-                :key="task.id"
-                :task="task"
-                @delete="removeTask"
-                @taskUpdated="fetchTasks"
-            />
+            <taskitem v-for="task in tasks" :key="task.id" :task="task" @delete="removeTask"
+                @taskUpdated="fetchTasks" />
         </div>
     </div>
 </template>
 
 <script>
 import TaskItem from './TaskItem.vue';
-import { getTasksByFilter } from '../db/db.js';
+import { getTasksByFilter, getFilters } from '../db/db.js';
 
 export default {
     name: 'TaskList',
@@ -22,30 +17,33 @@ export default {
         'taskitem': TaskItem,
     },
     props: {
-        filter: {
-            type: Object,
+        group: {
+            type: String,
             required: true,
         },
         sort: {
             type: String,
             default: '',
+        },
+        filterUpdateKey: {
+            type: Number,
+            default: 0,
         }
     },
     data() {
         return {
             tasks: [],
-        }
-    },
-    watch: {
-        filter: {
-            handler: 'fetchTasks',
-            deep: true,
-            immediate: true
+            filters: {
+                completion: '',
+                priority: '',
+                dueDate: ''
+            },
         }
     },
     methods: {
         async fetchTasks() {
-            let tasks = await getTasksByFilter(this.filter);
+            this.filters = await getFilters(this.group);
+            let tasks = await getTasksByFilter(this.filters);
             if (this.sort === 'priority') {
                 const priorityOrder = { High: 1, Medium: 2, Low: 3 };
                 tasks = tasks.slice().sort((a, b) => (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4));
@@ -64,6 +62,20 @@ export default {
     },
     mounted() {
         this.fetchTasks();
+    },
+    watch: {
+        group: {
+            handler: 'fetchTasks',
+            immediate: true
+        },
+        sort: {
+            handler: 'fetchTasks',
+            immediate: true
+        },
+        filterUpdateKey: {
+            handler: 'fetchTasks',
+            immediate: false
+        }
     }
 }
 </script>

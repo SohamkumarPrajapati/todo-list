@@ -25,9 +25,16 @@
 </template>
 
 <script>
+import { getFilters, setFilters } from '../db/db';
 
 export default {
   name: 'Filters',
+  props: {
+    group: {
+      type: String,
+      required: true,
+    }
+  },
   data() {
     return {
       filters: {
@@ -40,10 +47,14 @@ export default {
     }
   },
   methods: {
-    applyFilters() {
+    async applyFilters() {
+      await setFilters(this.group,this.filters);
       this.$emit('apply-filters', { ...this.filters });
     }
   },
+  async created() {
+    this.filters = await getFilters(this.group);
+  }
 }
 </script>
 
