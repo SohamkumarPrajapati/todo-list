@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import SignIn from '../views/SignIn.vue';
 
 Vue.use(VueRouter);
 
@@ -12,12 +11,12 @@ const routes = [
   },
   {
     path: "/signin",
-    component: SignIn,
+    component: () => import('../views/SignIn.vue'),
   }
 ]
 
 const router = new VueRouter({
-  mode: 'hash',
+  mode: 'history',
   routes: routes,
 });
 
