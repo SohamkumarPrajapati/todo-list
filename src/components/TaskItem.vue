@@ -92,6 +92,7 @@ export default {
             if (changed) {
                 await updateTask({ ...this.editableTask, id: this.localTask.id });
                 this.localTask = { ...this.editableTask };
+                this.$emit('taskUpdated',this.localTask);
             }
             this.editMode = false;
         },

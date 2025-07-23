@@ -6,6 +6,7 @@
                 :key="task.id"
                 :task="task"
                 @delete="removeTask"
+                @taskUpdated="fetchTasks"
             />
         </div>
     </div>
