@@ -36,14 +36,14 @@ export default {
             filters: {
                 completion: '',
                 priority: '',
-                dueDate: ''
+                dueDate: '',
             },
         }
     },
     methods: {
         async fetchTasks() {
             this.filters = await getFilters(this.group);
-            let tasks = await getTasksByFilter(this.filters);
+            let tasks = await getTasksByFilter(this.filters,this.group);
             if (this.sort === 'priority') {
                 const priorityOrder = { High: 1, Medium: 2, Low: 3 };
                 tasks = tasks.slice().sort((a, b) => (priorityOrder[a.priority] || 4) - (priorityOrder[b.priority] || 4));

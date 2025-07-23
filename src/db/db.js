@@ -53,7 +53,7 @@ export async function addTask(task) {
 }
 
 
-export async function getTasksByFilter(filter) {
+export async function getTasksByFilter(filter,filterOnGroup) {
     const db = await openDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(TASK_STORE, 'readonly');
@@ -67,8 +67,8 @@ export async function getTasksByFilter(filter) {
                     filter.completion === 'Completed' ? task.completed : !task.completed
                 );
             }
-            if (filter.group) {
-                tasks = tasks.filter(task => task.group === filter.group);
+            if (filterOnGroup) {
+                tasks = tasks.filter(task => task.group === filterOnGroup);
             }
             if (filter.priority) {
                 tasks = tasks.filter(task => task.priority === filter.priority);
