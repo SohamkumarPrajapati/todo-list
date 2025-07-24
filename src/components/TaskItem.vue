@@ -80,6 +80,8 @@ export default {
         async toggleCompletion() {
             this.localTask.completed = !this.localTask.completed;
             this.completed = !this.completed;
+            this.editMode = false;
+            this.editableTask = {};
             await updateTaskCompletion(this.localTask.id, this.localTask.completed);
         },
         startEdit() {

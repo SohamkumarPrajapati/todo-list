@@ -155,7 +155,7 @@ export async function addGroup(groupName) {
                         priority: '',
                         dueDate: ''
                     },
-                    sort: ''
+                    sort: 'priority'
                 });
                 addReq.onsuccess = () => resolve();
                 addReq.onerror = (e) => reject(e);
@@ -295,7 +295,7 @@ export async function setSorting(groupName,groupSorting) {
     const db = await openDB();
     return new Promise((resolve,reject) => {
         const transaction = db.transaction(GROUP_STORE,'readwrite');
-        const store = db.objectStore(GROUP_STORE);
+        const store = transaction.objectStore(GROUP_STORE);
         const getRequest = store.get(groupName);
 
         getRequest.onsuccess = function() {

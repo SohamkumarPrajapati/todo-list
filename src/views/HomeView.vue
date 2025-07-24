@@ -19,7 +19,7 @@
                                 <i class="fa-solid fa-sort"></i>
                             </div>
                             <select v-if="sortSelectOpen === group && isAccordionOpen(group)" class="sort-select"
-                                v-model="groupSorts[group]" @change="closeSortSelect" @click.stop>
+                                v-model="groupSorts[group]" @change="applySortAndCloseSelect" @click.stop>
                                 <option value="priority">Priority</option>
                                 <option value="duedate">Due Date</option>
                             </select>
@@ -32,8 +32,7 @@
                         </div>
                     </div>
                     <div v-show="isAccordionOpen(group)">
-                        <tasklist :group="group" :sort="groupSorts[group]"
-                            :filter-update-key="taskListUpdateKeys[group]" />
+                        <tasklist :group="group" :taskListUpdateKey="taskListUpdateKeys[group]" />
                     </div>
                 </div>
             </div>
@@ -51,7 +50,7 @@
 import TaskForm from '../components/TaskForm.vue';
 import TaskList from '../components/TaskList.vue';
 import Filters from '../components/Filters.vue';
-import { getAllGroups } from '../db/db';
+import { getAllGroups, setSorting } from '../db/db';
 
 export default {
     name: 'HomeView',
@@ -100,6 +99,11 @@ export default {
             if (task.group && !this.groups.includes(task.group)) {
                 this.groups.push(task.group);
             }
+            if (!this.taskListUpdateKeys[task.group]) {
+                this.$set(this.taskListUpdateKeys, task.group, 1);
+            } else {
+                this.$set(this.taskListUpdateKeys, task.group, this.taskListUpdateKeys[task.group] + 1);
+            }
         },
         toggleAccordion(group) {
             if (this.openAccordions.includes(group)) {
@@ -119,7 +123,13 @@ export default {
                 this.sortSelectOpen = group;
             }
         },
-        closeSortSelect() {
+        async applySortAndCloseSelect() {
+            await setSorting(this.sortSelectOpen, this.groupSorts[this.sortSelectOpen]);
+            if (!this.taskListUpdateKeys[this.sortSelectOpen]) {
+                this.$set(this.taskListUpdateKeys, this.sortSelectOpen, 1);
+            } else {
+                this.$set(this.taskListUpdateKeys, this.sortSelectOpen, this.taskListUpdateKeys[this.sortSelectOpen] + 1);
+            }
             this.sortSelectOpen = null;
         },
         openFilters(group) {

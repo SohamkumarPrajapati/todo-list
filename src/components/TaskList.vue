@@ -9,7 +9,7 @@
 
 <script>
 import TaskItem from './TaskItem.vue';
-import { getTasksByFilter, getFilters } from '../db/db.js';
+import { getTasksByFilter, getFilters, getSorting } from '../db/db.js';
 
 export default {
     name: 'TaskList',
@@ -21,11 +21,7 @@ export default {
             type: String,
             required: true,
         },
-        sort: {
-            type: String,
-            default: '',
-        },
-        filterUpdateKey: {
+        taskListUpdateKey: {
             type: Number,
             default: 0,
         }
@@ -38,11 +34,13 @@ export default {
                 priority: '',
                 dueDate: '',
             },
+            sort: '',
         }
     },
     methods: {
         async fetchTasks() {
             this.filters = await getFilters(this.group);
+            this.sort = await getSorting(this.group);
             let tasks = await getTasksByFilter(this.filters,this.group);
             if (this.sort === 'priority') {
                 const priorityOrder = { High: 1, Medium: 2, Low: 3 };
@@ -72,7 +70,7 @@ export default {
             handler: 'fetchTasks',
             immediate: true
         },
-        filterUpdateKey: {
+        taskListUpdateKey: {
             handler: 'fetchTasks',
             immediate: false
         }
